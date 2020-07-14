@@ -1,0 +1,18 @@
+{
+  "name": "toggl2slack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "dependencies": {
+    "@slack/webhook": "^5.0.3",
+    "axios": "^0.19.2",
+    "moment": "^2.27.0",
+    "moment-duration-format": "^2.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
