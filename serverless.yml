@@ -100,12 +100,11 @@ functions:
 
 #    Define function environment variables here
     environment:
-      toggl_url: 'https://toggl.com/reports/api/v2/details'
+      toggl_time_entries_api: https://www.toggl.com/api/v8/time_entries
+      toggl_projects_api: https://www.toggl.com/api/v8/workspaces/${self:functions.handler.environment.toggl_workspace_id}/projects
       toggl_api_token: ${ssm:toggl-api-token~true}
-      toggl_user_agent: ${ssm:toggl-user-agent~true}
       toggl_workspace_id: '3013684'
       slack_url: ${ssm:slack-url~true}
-      slack_channel_name: '#チャンネル名'
 
 # you can add CloudFormation resource templates here
 #resources:

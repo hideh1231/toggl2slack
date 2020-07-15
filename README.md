@@ -18,9 +18,8 @@ How to use
 1. `git clone git@github.com:hideh1231/toggl2slack.git && cd toggl2slack`
 2. `npm install`
 3. `serverless config credentials --provider aws --key your-key --secret your-secret-token`
-4. `aws ssm put-parameter --name toggl-user-agent --value "your email" --type SecureString`
-5. `aws ssm put-parameter --name toggl-api-token --value "your api token" --type SecureString` 
+4. `aws ssm put-parameter --name toggl-api-token --value "your api token" --type SecureString`
     - detail: <https://github.com/toggl/toggl_api_docs>
-6. `aws ssm put-parameter --name slack-url --value "slack incoming webhook" --type SecureString`
+5. `aws ssm put-parameter --name slack-url --value "slack incoming webhook" --type SecureString`
     - detail: <https://api.slack.com/messaging/webhooks>
-7. `serverless deploy`
+6. `serverless deploy`
