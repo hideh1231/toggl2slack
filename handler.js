@@ -6,9 +6,15 @@ require("moment-duration-format");
 exports.handler = async (event, context, callback) => {
   const start_date = moment_timezone().tz('Asia/Tokyo').subtract(2, 'day').hour(5).minutes(0).second(0)
   const end_date = moment_timezone().tz('Asia/Tokyo').subtract(1, 'day').hour(5).minutes(0).second(0)
+  const date = end_date.format('YYYY/M/D')
   const projects = await get_toggl_projects()
   const res = await get_toggl_time_entries(start_date, end_date)
   const res_data = Object.entries(res.data)
+  res_data.sort((a, b) => {
+    if (a[1].start < b[1].start) return -1;
+    else if (a[1].start > b[1].start) return 1;
+    else return 0;
+  })
   let payload_arr = []
   for (data of res_data) {
     data = data[1]
@@ -17,33 +23,32 @@ exports.handler = async (event, context, callback) => {
     const duration = moment.duration(stop.diff(start), "ms")
     const payload = make_payload(
       data.description,
-      duration.format('hh:mm:ss', { trim: false }),
-      start.format('MM/DD HH:mm'),
-      stop.format('MM/DD HH:mm'),
+      duration.format('h:mm:ss', { trim: false }),
+      start.format('h:mm A'),
+      stop.format('h:mm A'),
       data.pid,
       projects.data
     )
     payload_arr.push(payload)
   }
-  payload_arr.sort((a, b) => {
-    a_start = a.blocks[0].fields[6].text
-    b_start = b.blocks[0].fields[6].text
-    if (a_start < b_start) return -1;
-    else if (a_start > b_start) return 1;
-    else return 0;
-  })
-  payload_arr.map((payload) => {
-    console.log(payload.blocks[0])
-    post_slack(payload)
-  })
-  callback(null, {
-    statusCode: 200,
-    body: {}
+  payload_arr.push({
+    text: `${date}`,
+    blocks: [
+      {
+        "type": "divider"
+      }
+    ]
   });
+  (async () => {
+    for (payload of payload_arr) {
+      // console.log(payload)
+      await post_slack(payload)
+    }
+  })();
 };
 
-const get_toggl_time_entries = async (start_date, end_date) => {
-  return await axios.get(
+const get_toggl_time_entries = (start_date, end_date) => {
+  return axios.get(
     process.env.toggl_time_entries_api,
     {
       auth: {
@@ -74,7 +79,7 @@ const get_toggl_projects = async () => {
     })
 }
 
-const post_slack = async (payload) => {
+const post_slack = (payload) => {
   return axios.post(process.env.slack_url, payload)
     .catch((error) => {
       console.log(error)
@@ -84,56 +89,22 @@ const post_slack = async (payload) => {
 
 const make_payload = (description, duration, start, stop, pid, projects) => {
   let payload = {
-    text: `*${description}* #808080`,
+    text: description,
     blocks: [
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `*${description}* #808080`
+          text: `*${description}* #808080\n${start} - ${stop} (${duration})`
         },
-        fields: [
-          {
-            type: "mrkdwn",
-            text: "*Duration*",
-          },
-          {
-            type: "mrkdwn",
-            text: " ",
-          },
-          {
-            type: "mrkdwn",
-            text: duration,
-          },
-          {
-            type: "mrkdwn",
-            text: " ",
-          },
-          {
-            type: "mrkdwn",
-            text: "*Start*",
-          },
-          {
-            type: "mrkdwn",
-            text: "*End*",
-          },
-          {
-            type: "mrkdwn",
-            text: start,
-          },
-          {
-            type: "mrkdwn",
-            text: stop,
-          },
-        ]
       }
     ]
   }
   if (pid) {
     for (p_data of projects) {
       if (p_data.id == pid) {
-        payload.text = `*${description}* : ${p_data.name} ${p_data.hex_color}`
-        payload.blocks[0].text.text = `*${description}* : ${p_data.name} ${p_data.hex_color}`
+        payload.text = `*${description}* : ${p_data.name}`
+        payload.blocks[0].text.text = `*${description}* : ${p_data.name} ${p_data.hex_color}\n${start} - ${stop} (${duration})`
         break
       }
     }
