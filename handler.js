@@ -4,8 +4,8 @@ const moment_timezone = require('moment-timezone')
 require("moment-duration-format");
 
 exports.handler = async (event, context, callback) => {
-  const start_date = moment_timezone().tz('Asia/Tokyo').subtract(2, 'day').hour(5).minutes(0).second(0)
-  const end_date = moment_timezone().tz('Asia/Tokyo').subtract(1, 'day').hour(5).minutes(0).second(0)
+  const start_date = moment_timezone().tz('Asia/Tokyo').subtract(1, 'day').hour(5).minutes(0).second(0)
+  const end_date = moment_timezone().tz('Asia/Tokyo').hour(5).minutes(0).second(0)
   const date = end_date.format('YYYY/M/D')
   const projects = await get_toggl_projects()
   const res = await get_toggl_time_entries(start_date, end_date)
@@ -30,7 +30,7 @@ exports.handler = async (event, context, callback) => {
       projects.data
     )
     payload_arr.push(payload)
-  }
+  };
   payload_arr.push({
     text: `${date}`,
     blocks: [
@@ -41,7 +41,7 @@ exports.handler = async (event, context, callback) => {
   });
   (async () => {
     for (payload of payload_arr) {
-      // console.log(payload)
+      console.log(payload)
       await post_slack(payload)
     }
   })();
