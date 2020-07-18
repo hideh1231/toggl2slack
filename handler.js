@@ -45,6 +45,10 @@ exports.handler = async (event, context, callback) => {
       await post_slack(payload)
     }
   })();
+  return {
+    'statusCode': 200,
+    'body': json.dumps('Success!')
+  }
 };
 
 const get_toggl_time_entries = (start_date, end_date) => {
