@@ -39,16 +39,14 @@ exports.handler = async (event, context, callback) => {
       }
     ]
   });
-  (async () => {
-    for (payload of payload_arr) {
-      console.log(payload)
-      await post_slack(payload)
-    }
-    await callback(null, {
-      status_code: 200,
-      body: 'Success'
-    });
-  })();
+  for (payload of payload_arr) {
+    console.log(payload)
+    await post_slack(payload)
+  };
+  await callback(null, {
+    status_code: 200,
+    body: 'Success'
+  });
 };
 
 const get_toggl_time_entries = (start_date, end_date) => {
