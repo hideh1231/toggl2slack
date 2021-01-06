@@ -5,7 +5,7 @@
   "main": "handler.js",
   "dependencies": {
     "@slack/webhook": "^5.0.3",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "moment": "^2.27.0",
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.31"
